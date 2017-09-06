@@ -1,6 +1,5 @@
 'use strict';
 
-var ES6Set = require('es6-set');
 var isUtf8 = require('is-utf8');
 var enumerateFiles = require('enumerate-files');
 var readChunkSync = require('read-chunk').sync;
@@ -11,7 +10,7 @@ function isFileUtf8(path) {
 }
 
 function filterUtf8Files(filePaths) {
-  return new ES6Set(toArray(filePaths).filter(isFileUtf8));
+  return new Set(toArray(filePaths).filter(isFileUtf8));
 }
 
 module.exports = function listUtf8Files(dir) {
