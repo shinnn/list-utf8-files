@@ -27,7 +27,7 @@
     "async"
   ],
   "dependencies": {
-    "enumerate-files": "^0.3.0",
+    "enumerate-files": "^1.0.0",
     "is-utf8": "^0.2.1",
     "read-chunk": "^2.1.0"
   },

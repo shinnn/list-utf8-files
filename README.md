@@ -42,35 +42,33 @@ const listUtf8Files = require('list-utf8-files');
 ### listUtf8Files(*dir*)
 
 *dir*: `string` (directory path)  
-<!-- *options*: `Object` ([`readdir-sorted`](https://github.com/shinnn/readdir-sorted) options) -->  
+*options*: `Object` ([`readdir-sorted`](https://github.com/shinnn/readdir-sorted) options)  
 Return: `Promise<Set<string>>`
 
 The promise will be fulfilled with a [`Set`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Set) of strings — absolute paths of all [UTF-8-encoded](https://github.com/wayfind/is-utf8) files included in the given directory.
 
-<!--
 Options are directly passed to the underlying [`readdir-sorted`](https://github.com/shinnn/readdir-sorted#readdirsortedpath--options) to control the order of results.
 
 ```javascript
-listDirectories('/dirs').then(files => {
-  const iterator = files.keys();
+listDirectories('/example').then(files => {
+  const iterator = files.values();
 
-  iterator.next().value; //=> '/dirs/10'
-  iterator.next().value; //=> '/dirs/2a'
-  iterator.next().value; //=> '/dirs/2A'
+  iterator.next().value; //=> '/example/10.js'
+  iterator.next().value; //=> '/example/2a.js'
+  iterator.next().value; //=> '/example/2A.js'
 });
 
-listDirectories('/dirs', {
+listDirectories('/example', {
   numeric: true,
   caseFirst: 'upper'
 }).then(files => {
-  const iterator = files.keys();
+  const iterator = files.values();
 
-  iterator.next().value; //=> '/dirs/2A'
-  iterator.next().value; //=> '/dirs/2a'
-  iterator.next().value; //=> '/dirs/10'
+  iterator.next().value; //=> '/dirs/2A.js'
+  iterator.next().value; //=> '/dirs/2a.js'
+  iterator.next().value; //=> '/dirs/10.js'
 });
 ```
--->
 
 ## License
 

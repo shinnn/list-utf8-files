@@ -9,9 +9,9 @@ function isFileUtf8(path) {
 }
 
 function filterUtf8Files(filePaths) {
-  return new Set(Array.from(filePaths).filter(isFileUtf8));
+  return new Set([...filePaths].filter(isFileUtf8));
 }
 
-module.exports = function listUtf8Files(dir, options) {
-  return enumerateFiles(dir, options).then(filterUtf8Files);
+module.exports = function listUtf8Files(...args) {
+  return enumerateFiles(...args).then(filterUtf8Files);
 };

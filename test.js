@@ -12,7 +12,7 @@ const promisifiedMkdir = promisify(mkdir);
 const promisifiedWriteFile = promisify(writeFile);
 
 test('listUtf8File()', async t => {
-  t.plan(4);
+  t.plan(7);
 
   const tmp = join(__dirname, 'tmp');
 
@@ -26,12 +26,12 @@ test('listUtf8File()', async t => {
     promisifiedMkdir(join(tmp, 'dir'))
   ]);
 
-  listUtf8File(tmp).then(files => {
+  listUtf8File(tmp, {numeric: true}).then(files => {
     t.ok(files instanceof Set, 'should be fulfilled with a Set instance.');
 
-    t.deepEqual([...files].sort(), [
-      '10',
+    t.deepEqual([...files], [
       '2',
+      '10',
       'empty-file'
     ].map(path => join(tmp, path)), 'should list directories in a given directory.');
   }).catch(t.fail);
@@ -43,8 +43,32 @@ test('listUtf8File()', async t => {
   listUtf8File([0, 1]).catch(err => {
     t.equal(
       err.toString(),
-      'TypeError: Expected a path of the directory (string), but got a non-string value [ 0, 1 ].',
-      'should fail when it takes a non-string argument.'
+      'TypeError: Expected a directory path (string), but got [ 0, 1 ] (array).',
+      'should fail when it takes a non-string path.'
+    );
+  });
+
+  listUtf8File('Hi', 0).catch(err => {
+    t.equal(
+      err.toString(),
+      'TypeError: The second argument of readdir-sorted must be a plain object, but got 0 (number).',
+      'should fail when it takes a non-object option.'
+    );
+  });
+
+  listUtf8File().catch(err => {
+    t.equal(
+      err.toString(),
+      'TypeError: Expected 1 or 2 arguments (path: String[, options: Object]), but got no arguments.',
+      'should fail when it takes no arguments.'
+    );
+  });
+
+  listUtf8File(1, 2, 3).catch(err => {
+    t.equal(
+      err.toString(),
+      'TypeError: Expected 1 or 2 arguments (path: String[, options: Object]), but got 3 arguments.',
+      'should fail when it takes too many arguments.'
     );
   });
 });
