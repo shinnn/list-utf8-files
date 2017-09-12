@@ -12,6 +12,6 @@ function filterUtf8Files(filePaths) {
   return new Set([...filePaths].filter(isFileUtf8));
 }
 
-module.exports = function listUtf8Files(...args) {
-  return enumerateFiles(...args).then(filterUtf8Files);
+module.exports = async function listUtf8Files(...args) {
+  return filterUtf8Files(await enumerateFiles(...args));
 };
