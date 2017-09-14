@@ -1,17 +1,24 @@
 'use strict';
 
-const isUtf8 = require('is-utf8');
 const enumerateFiles = require('enumerate-files');
-const readChunkSync = require('read-chunk').sync;
-
-function isFileUtf8(path) {
-  return isUtf8(readChunkSync(path, 0, 4));
-}
-
-function filterUtf8Files(filePaths) {
-  return new Set([...filePaths].filter(isFileUtf8));
-}
+const isFileUtf8 = require('is-file-utf8');
 
 module.exports = async function listUtf8Files(...args) {
-  return filterUtf8Files(await enumerateFiles(...args));
+  const paths = await enumerateFiles(...args);
+  const results = new Set();
+  const promises = new Set();
+
+  for (const path of paths) {
+    promises.add(isFileUtf8(path));
+  }
+
+  const pathIterator = paths.values();
+
+  for (const isUtf8 of await Promise.all(promises)) {
+    if (isUtf8) {
+      results.add(pathIterator.next().value);
+    }
+  }
+
+  return results;
 };

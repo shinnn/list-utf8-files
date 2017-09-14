@@ -28,8 +28,7 @@
   ],
   "dependencies": {
     "enumerate-files": "^1.0.0",
-    "is-utf8": "^0.2.1",
-    "read-chunk": "^2.1.0"
+    "is-file-utf8": "^1.0.0"
   },
   "devDependencies": {
     "@shinnn/eslint-config-node": "^4.0.2",
