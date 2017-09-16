@@ -20,10 +20,10 @@ test('listUtf8File()', async t => {
   await promisifiedMkdir(tmp);
   await Promise.all([
     promisifiedWriteFile(join(tmp, 'empty-file'), ''),
-    promisifiedWriteFile(join(tmp, 'non-utf8'), Buffer.from([1, 2, 3])),
+    promisifiedWriteFile(join(tmp, '__non-utf8___'), Buffer.from([1, 2, 3])),
     promisifiedWriteFile(join(tmp, '2'), 'a'),
     promisifiedWriteFile(join(tmp, '10'), 'b'),
-    promisifiedMkdir(join(tmp, 'dir'))
+    promisifiedMkdir(join(tmp, '__dir__'))
   ]);
 
   listUtf8File(tmp, {numeric: true}).then(files => {

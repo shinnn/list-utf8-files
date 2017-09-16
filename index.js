@@ -15,8 +15,10 @@ module.exports = async function listUtf8Files(...args) {
   const pathIterator = paths.values();
 
   for (const isUtf8 of await Promise.all(promises)) {
+    const {value} = pathIterator.next();
+
     if (isUtf8) {
-      results.add(pathIterator.next().value);
+      results.add(value);
     }
   }
 
