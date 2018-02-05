@@ -36,14 +36,14 @@ test('listUtf8File()', async t => {
 		].map(path => join(tmp, path)), 'should list directories in a given directory.');
 	}).catch(t.fail);
 
-	listUtf8File('not-found').catch(err => {
-		t.equal(err.code, 'ENOENT', 'should fail when it cannot find the directory.');
+	listUtf8File(Buffer.from('not-found')).catch(({code}) => {
+		t.equal(code, 'ENOENT', 'should fail when it cannot find the directory.');
 	});
 
 	listUtf8File([0, 1]).catch(err => {
 		t.equal(
 			err.toString(),
-			'TypeError: Expected a directory path (string), but got [ 0, 1 ] (array).',
+			'TypeError: path must be a string or Buffer',
 			'should fail when it takes a non-string path.'
 		);
 	});
@@ -59,7 +59,7 @@ test('listUtf8File()', async t => {
 	listUtf8File().catch(err => {
 		t.equal(
 			err.toString(),
-			'TypeError: Expected 1 or 2 arguments (path: String[, options: Object]), but got no arguments.',
+			'TypeError: Expected 1 or 2 arguments (path: <string|Buffer|URL>[, options: <Object>]), but got no arguments.',
 			'should fail when it takes no arguments.'
 		);
 	});
@@ -67,7 +67,7 @@ test('listUtf8File()', async t => {
 	listUtf8File(1, 2, 3).catch(err => {
 		t.equal(
 			err.toString(),
-			'TypeError: Expected 1 or 2 arguments (path: String[, options: Object]), but got 3 arguments.',
+			'TypeError: Expected 1 or 2 arguments (path: <string|Buffer|URL>[, options: <Object>]), but got 3 arguments.',
 			'should fail when it takes too many arguments.'
 		);
 	});
