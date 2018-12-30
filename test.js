@@ -2,7 +2,7 @@
 
 const {join} = require('path');
 const {mkdir, writeFile} = require('fs');
-const {promisify} = require('util');
+const {promisify, types: {isSet}} = require('util');
 
 const listUtf8File = require('.');
 const rmfr = require('rmfr');
@@ -12,7 +12,7 @@ const promisifiedMkdir = promisify(mkdir);
 const promisifiedWriteFile = promisify(writeFile);
 
 test('listUtf8File()', async t => {
-	t.plan(7);
+	t.plan(3);
 
 	const tmp = join(__dirname, 'tmp');
 
@@ -26,49 +26,75 @@ test('listUtf8File()', async t => {
 		promisifiedMkdir(join(tmp, '__dir__'))
 	]);
 
-	listUtf8File(tmp, {numeric: true}).then(files => {
-		t.ok(files instanceof Set, 'should be fulfilled with a Set instance.');
+	(async () => {
+		const files = await listUtf8File(tmp, {
+			encoding: 'buffer',
+			numeric: true
+		});
 
+		t.ok(isSet(files), 'should be fulfilled with a Set instance.');
 		t.deepEqual([...files], [
 			'2',
 			'10',
 			'empty-file'
-		].map(path => join(tmp, path)), 'should list directories in a given directory.');
-	}).catch(t.fail);
+		].map(path => Buffer.from(join(tmp, path))), 'should list directories in a given directory.');
+	})();
 
-	listUtf8File(Buffer.from('not-found')).catch(({code}) => {
-		t.equal(code, 'ENOENT', 'should fail when it cannot find the directory.');
-	});
+	(async () => {
+		try {
+			await listUtf8File(Buffer.from('not-found'));
+		} catch ({code}) {
+			t.equal(code, 'ENOENT', 'should fail when it cannot find the directory.');
+		}
+	})();
+});
 
-	listUtf8File([0, 1]).catch(err => {
+test('Argument validation', async t => {
+	const fail = t.fail.bind(t, 'Unexpectedly succeeded.');
+
+	try {
+		await listUtf8File([0, 1]);
+		fail();
+	} catch ({code}) {
 		t.equal(
-			err.toString(),
-			'TypeError: path must be a string or Buffer',
-			'should fail when it takes a non-string path.'
+			code,
+			'ERR_INVALID_ARG_TYPE',
+			'should fail when it takes an invalid path type.'
 		);
-	});
+	}
 
-	listUtf8File('Hi', 0).catch(err => {
+	try {
+		await listUtf8File('Hi', 0);
+		fail();
+	} catch (err) {
 		t.equal(
 			err.toString(),
-			'TypeError: The second argument of readdir-sorted must be a plain object, but got 0 (number).',
+			'TypeError: Expected a plain <Object> to set readdir-sorted options, but got 0 (number).',
 			'should fail when it takes a non-object option.'
 		);
-	});
+	}
 
-	listUtf8File().catch(err => {
+	try {
+		await listUtf8File();
+		fail();
+	} catch (err) {
 		t.equal(
 			err.toString(),
 			'TypeError: Expected 1 or 2 arguments (path: <string|Buffer|URL>[, options: <Object>]), but got no arguments.',
 			'should fail when it takes no arguments.'
 		);
-	});
+	}
 
-	listUtf8File(1, 2, 3).catch(err => {
+	try {
+		await listUtf8File('.', {}, {});
+		fail();
+	} catch (err) {
 		t.equal(
 			err.toString(),
 			'TypeError: Expected 1 or 2 arguments (path: <string|Buffer|URL>[, options: <Object>]), but got 3 arguments.',
 			'should fail when it takes too many arguments.'
 		);
-	});
+	}
+
+	t.end();
 });
